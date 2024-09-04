@@ -1,14 +1,19 @@
 const express = require('express');
 const router = express.Router();
 const productController = require('../controllers/productController');
+const authMiddleware = require('../middleware/authMiddleware'); // Middleware for authentication
 
-// Route to create a new product with image upload
-router.post('/', productController.createProduct);
+// Create a new product (only for sellers)
+router.post('/', authMiddleware, productController.createProduct);
 
-// Route to get all products
+
+// Get all products (optional)
 router.get('/', productController.getAllProducts);
 
-// Route to get products by category
+// Get products by category with image URLs
 router.get('/category/:category', productController.getProductsByCategory);
+
+// Get products by specific seller
+router.get('/seller/:sellerId', productController.getProductsBySeller);
 
 module.exports = router;

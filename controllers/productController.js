@@ -1,5 +1,3 @@
-// controllers/productController.js
-
 const Product = require('../models/Product');
 const multer = require('multer');
 const path = require('path');
@@ -41,7 +39,10 @@ exports.createProduct = async (req, res) => {
       const { name, price, description, category } = req.body;
       const image = req.file ? req.file.path : ''; // Store the image path
 
-      const newProduct = new Product({ name, image, price, description, category });
+      // Assuming req.user._id contains the authenticated seller's info
+      const seller = req.user._id;
+
+      const newProduct = new Product({ name, image, price, description, category, seller });
       await newProduct.save();
 
       res.status(201).json({ message: 'Product created successfully', product: newProduct });
@@ -89,3 +90,24 @@ exports.getProductsByCategory = async (req, res) => {
     res.status(500).json({ message: 'Error fetching products by category', error });
   }
 };
+
+// Fetch products by a specific seller with their image URLs
+exports.getProductsBySeller = async (req, res) => {
+  try {
+    const { sellerId } = req.params;
+    const products = await Product.find({ seller: sellerId });
+
+    // Map products to include full image URL
+    const productsWithImageURL = products.map(product => {
+      return {
+        ...product._doc,
+        image: `${req.protocol}://${req.get('host')}/${product.image}` // Full image URL
+      };
+    });
+
+    res.status(200).json(productsWithImageURL);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching products by seller', error });
+  }
+};
+

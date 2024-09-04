@@ -24,7 +24,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Routes
 app.use('/auth', authRoutes); // Use auth routes
-app.use(verifyToken);
+// app.use(verifyToken);
 app.use('/products', productRoutes);
 
 // Connect to MongoDB
