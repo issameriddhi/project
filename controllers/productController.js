@@ -2,31 +2,19 @@ const Product = require('../models/Product');
 const multer = require('multer');
 const path = require('path');
 
-// Configure Multer storage
+
+// Set up the Multer middleware
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'uploads/'); // Directory to store uploaded images
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/');
   },
-  filename: (req, file, cb) => {
-    cb(null, `${Date.now()}-${file.originalname}`); // Create a unique file name
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + '-' + file.originalname); // Generate a unique filename
   }
 });
 
-// Set up the Multer middleware
-const upload = multer({
-  storage: storage,
-  fileFilter: (req, file, cb) => {
-    const fileTypes = /jpeg|jpg|png/;
-    const extname = fileTypes.test(path.extname(file.originalname).toLowerCase());
-    const mimetype = fileTypes.test(file.mimetype);
+const upload = multer({ storage: storage, limits: { fileSize: 5 * 1024 * 1024 } }).single('image');
 
-    if (mimetype && extname) {
-      return cb(null, true);
-    } else {
-      cb('Error: Images Only!');
-    }
-  }
-}).single('image'); // Accept a single file with the field name 'image'
 
 // Controller function to create a new product with image upload
 exports.createProduct = async (req, res) => {
@@ -36,11 +24,11 @@ exports.createProduct = async (req, res) => {
     }
 
     try {
-      const { name, price, description, category } = req.body;
+      console.log(req.body)
+      const { name, price, description, category,seller } = req.body;
       const image = req.file ? req.file.path : ''; // Store the image path
 
       // Assuming req.user._id contains the authenticated seller's info
-      const seller = req.user._id;
 
       const newProduct = new Product({ name, image, price, description, category, seller });
       await newProduct.save();
@@ -48,6 +36,7 @@ exports.createProduct = async (req, res) => {
       res.status(201).json({ message: 'Product created successfully', product: newProduct });
     } catch (error) {
       res.status(500).json({ message: 'Error creating product', error });
+      console.log(error )
     }
   });
 };

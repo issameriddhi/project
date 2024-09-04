@@ -4,7 +4,7 @@ const productController = require('../controllers/productController');
 const authMiddleware = require('../middleware/authMiddleware'); // Middleware for authentication
 
 // Create a new product (only for sellers)
-router.post('/', authMiddleware, productController.createProduct);
+router.post('/', productController.createProduct);
 
 
 // Get all products (optional)

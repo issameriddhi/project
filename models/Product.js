@@ -10,7 +10,7 @@ const productSchema = new mongoose.Schema({
     enum: ['clothing', 'accessories', 'sustainable'], 
     required: true 
   },
-  seller: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // Link to seller
+  seller: { type: String, ref: 'User', required: true }, // Link to seller
   createdAt: { type: Date, default: Date.now }
 });
 
